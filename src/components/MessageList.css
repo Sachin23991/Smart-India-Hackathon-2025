@@ -1,15 +1,14 @@
-/* src/components/MessageList.css */
-.message-list {
+.message-list-container {
   display: flex;
   flex-direction: column;
   gap: 15px;
   padding: 10px;
 }
 
-.message-container {
+.message-wrapper {
   display: flex;
   align-items: flex-end;
-  max-width: 85%; 
+  max-width: 85%;
   animation: messageFadeIn 0.4s ease-out forwards;
 }
 
@@ -18,16 +17,19 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.message-container.user {
+/* User message: avatar on right */
+.message-wrapper.user {
   align-self: flex-end;
   flex-direction: row-reverse;
 }
 
-.message-container.bot {
+/* Bot message: avatar on left */
+.message-wrapper.bot {
   align-self: flex-start;
+  flex-direction: row;
 }
 
-.avatar {
+.message-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -37,10 +39,10 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.avatar img {
+.message-avatar img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .message-bubble {
@@ -53,23 +55,24 @@
   word-wrap: break-word;
 }
 
-.message-container.bot .message-bubble {
+.message-wrapper.bot .message-bubble {
   background-color: #e9ecef;
   border-bottom-left-radius: 5px;
 }
 
-.message-container.user .message-bubble {
+.message-wrapper.user .message-bubble {
   background-color: var(--brand-color);
   color: white;
   border-bottom-right-radius: 5px;
 }
 
-/* Styles for markdown content inside bubbles */
+/* Markdown content inside bubbles */
 .message-bubble p {
   margin: 0;
 }
 
-.message-bubble ul, .message-bubble ol {
+.message-bubble ul,
+.message-bubble ol {
   padding-left: 20px;
   margin-top: 5px;
   margin-bottom: 5px;
@@ -77,4 +80,34 @@
 
 .message-bubble strong {
   color: inherit;
+}
+
+/* Typing indicator animation */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.typing-indicator span {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: #bbb;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: typingBounce 1.2s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(1); opacity: 0.7; }
+  40% { transform: scale(1.5); opacity: 1; }
 }
