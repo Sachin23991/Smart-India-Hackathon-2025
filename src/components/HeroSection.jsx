@@ -1,201 +1,275 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "./ui/Button";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
-import { auth } from "../firebase";
-import heroVideo from "../assets/Video_Generation_for_Career_Flow.mp4";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
 import "./HeroSection.css";
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  const handleJourneyStart = () => {
-    const user = auth.currentUser;
-    navigate(user ? "/dashboard" : "/login");
+  // Roadmap steps config
+  const steps = useMemo(
+    () => [
+      { id: 0, title: "Assess Skills", icon: "🧭", color: "#3B82F6", link: "/resume-analyzer" },
+      { id: 1, title: "Build Profile", icon: "🧱", color: "#10B981", link: "/resume-builder" },
+      { id: 2, title: "Explore Paths", icon: "🗺️", color: "#F59E0B", link: "/college-finder" },
+      { id: 3, title: "Find Opportunities", icon: "🎯", color: "#EF4444", link: "/jobs" },
+      { id: 4, title: "Connect & Grow", icon: "🌐", color: "#8B5CF6", link: "/community" },
+      { id: 5, title: "Track Success", icon: "📈", color: "#06B6D4", link: "/notifications" },
+    ],
+    []
+  );
+
+  // Feature cards config
+  const features = useMemo(
+    () => [
+      { title: "DreamFlow AI", desc: "AI Career Bot", icon: "🤖", color: "#8B5CF6", link: "/ai-bot" },
+      { title: "Resume Analyzer", desc: "ATS Score", icon: "📝", color: "#10B981", link: "/resume-analyzer" },
+      { title: "Scholarships", desc: "Funding", icon: "🎓", color: "#F59E0B", link: "/scholarships" },
+      { title: "Job Alerts", desc: "Real-time", icon: "📣", color: "#EF4444", link: "/jobs" },
+      { title: "Courses", desc: "Skill Up", icon: "📚", color: "#06B6D4", link: "/courses" },
+      { title: "Events", desc: "Networking", icon: "📅", color: "#EC4899", link: "/events" },
+    ],
+    []
+  );
+
+  const [activeStep, setActiveStep] = useState(0);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Auto-advance roadmap
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % steps.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [steps.length]);
+
+  // Smooth scroll to roadmap
+  const scrollToRoadmap = () => {
+    const el = document.getElementById("roadmap");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 },
-    },
+  // Watch demo placeholder
+  const watchDemo = () => {
+    // Replace with your modal or video route
+    navigate("/demo");
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Parallax effect for video/image
-  const handleMouseMove = (e) => {
-    const { innerWidth, innerHeight } = window;
-    const x = (e.clientX / innerWidth - 0.5) * 20;
-    const y = (e.clientY / innerHeight - 0.5) * 20;
-    setMousePos({ x, y });
+  // Close mobile menu when navigating
+  const handleNavClick = (path) => {
+    setMobileMenuOpen(false);
+    navigate(path);
   };
 
   return (
-    <>
-      <Navbar />
-      <main className="hero-container" onMouseMove={handleMouseMove}>
+    <div className="homepage">
+      {/* Header */}
+      <motion.header initial={{ y: -100 }} animate={{ y: 0 }} className="header">
+        <div className="nav-container">
+          <div className="logo">
+            {/* Keep this path aligned with your fixed logo path rule */}
+            <img src="/logo.png" alt="CarrerFlow Logo" className="logo-icon" />
+            <span className="logo-text">CarrerFlow</span>
+          </div>
+
+          <button 
+            className="menu-toggle" 
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
+
+          <nav className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`} aria-label="Primary">
+            <Link to="/jobs" onClick={() => setMobileMenuOpen(false)}>Jobs</Link>
+            <Link to="/community" onClick={() => setMobileMenuOpen(false)}>Community</Link>
+            <Link to="/scholarships" onClick={() => setMobileMenuOpen(false)}>Scholarships</Link>
+            <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Login</Link>
+          </nav>
+        </div>
+      </motion.header>
+
+      {/* Hero */}
+      <section className="hero" aria-labelledby="hero-title">
         <motion.div
           className="hero-content"
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
         >
-          <motion.div className="website-name" variants={itemVariants}>
-            CareerFlow
-          </motion.div>
+          <h1 id="hero-title" className="hero-title">
+            Chart Your <span className="highlight">Career Path</span>
+            <br />
+            with <span className="ai-highlight">CarrerFlow</span>
+          </h1>
 
-          <motion.h1 className="hero-main-heading" variants={itemVariants}>
-            <span className="heading-accent">
-              Guidance That Never Leaves You Halfway
-            </span>
-          </motion.h1>
+          <p className="hero-subtitle">
+            Your all-in-one career guidance platform with AI-powered insights, resume tools, job
+            matching, and community support.
+          </p>
 
-          <div className="hero-grid">
-            {/* Left content */}
-            <motion.div
-              className="hero-left-content"
-              initial="hidden"
-              animate="visible"
-              variants={containerVariants}
+          <div className="hero-buttons">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="cta-primary"
+              onClick={scrollToRoadmap}
             >
-              <motion.p className="hero-description" variants={itemVariants}>
-                Your End-to-End Career Journey, Reimagined. CareerFlow is your
-                integrated platform for the entire career lifecycle — from
-                exploration and planning to execution and landing your dream
-                job.
-              </motion.p>
+              Start Your Journey
+            </motion.button>
 
-              <motion.div className="usp-tagline" variants={itemVariants}>
-                A complete journey, not just advice. CareerFlow doesn't stop at
-                suggesting careers — it guides students step by step, from
-                exploring options to becoming job-ready.
-              </motion.div>
-
-              <motion.div className="usp-points" variants={containerVariants}>
-                {[
-                  {
-                    title: "AI + Human Mentorship",
-                    description:
-                      "Blends AI-powered insights with real mentor guidance",
-                    iconPath: "M13 10V3L4 14h7v7l9-11h-7z",
-                  },
-                  {
-                    title: "Resumes That Actually Work",
-                    description: "ATS-optimized resumes with scoring system",
-                    iconPath:
-                      "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-                  },
-                  {
-                    title: "Smart Progress Tracking",
-                    description:
-                      "Real-time monitoring with reminders and support",
-                    iconPath:
-                      "M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z",
-                  },
-                  {
-                    title: "Built for Every Student",
-                    description: "Adapts to your journey from school to career",
-                    iconPath:
-                      "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
-                  },
-                ].map((usp, index) => (
-                  <motion.div
-                    className="usp-point hover-3d"
-                    key={index}
-                    variants={itemVariants}
-                    whileHover={{ rotateX: 5, rotateY: 5, scale: 1.03 }}
-                  >
-                    <svg
-                      className="usp-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d={usp.iconPath}
-                      />
-                    </svg>
-                    <div className="usp-content">
-                      <h4>{usp.title}</h4>
-                      <p>{usp.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              <motion.div
-                className="model-promises"
-                variants={containerVariants}
-              >
-                <h3>Our Model Promises</h3>
-                <div className="promise-grid">
-                  {[
-                    "Clear career path with exact steps",
-                    "Complete start-to-finish guidance",
-                    "24/7 mentor and AI support",
-                    "Higher employability with ATS resumes",
-                  ].map((text, idx) => (
-                    <motion.div
-                      className="promise-item hover-3d"
-                      key={idx}
-                      variants={itemVariants}
-                      whileHover={{ rotateX: 3, rotateY: 3, scale: 1.02 }}
-                    >
-                      <div className="promise-dot"></div>
-                      <span className="promise-text">{text}</span>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Right content */}
-            <motion.div
-              className="hero-right-content-wrapper"
-              style={{
-                transform: `rotateY(${
-                  mousePos.x
-                }deg) rotateX(${-mousePos.y}deg)`,
-              }}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="cta-secondary"
+              onClick={watchDemo}
             >
-              <div className="hero-image-container">
-                <div className="hero-image-wrapper">
-                  <video
-                    className="hero-video"
-                    src={heroVideo}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  />
-                </div>
-              </div>
-
-              <div className="cta-container">
-                <Button
-                  className="primary-button glow-button"
-                  onClick={handleJourneyStart}
-                >
-                  Start Your Journey
-                </Button>
-              </div>
-            </motion.div>
+              Watch Demo
+            </motion.button>
           </div>
         </motion.div>
-      </main>
-      <Footer />
-    </>
+
+        {/* Roadmap */}
+        <div id="roadmap" className="roadmap-container">
+          <div className="roadmap">
+            <svg className="roadmap-path" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true">
+              <path
+                d="M 50,150 Q 200,100 350,140 Q 500,180 650,120 Q 800,160 950,140 Q 1100,120 1150,150"
+                stroke="#E5E7EB"
+                strokeWidth="4"
+                fill="none"
+                strokeLinecap="round"
+              />
+            </svg>
+
+            <div className="roadmap-steps">
+              {steps.map((step, index) => {
+                const isActive = activeStep === index;
+                return (
+                  <motion.div
+                    key={step.id}
+                    className={`roadmap-step ${isActive ? "active" : ""}`}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: isActive ? 1.05 : 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                    style={{ ["--step-color"]: step.color }}
+                    onClick={() => {
+                      setActiveStep(index);
+                      navigate(step.link);
+                    }}
+                  >
+                    <div className="step-icon" aria-hidden="true">
+                      {step.icon}
+                    </div>
+                    <div className="step-content">
+                      <h3>{step.title}</h3>
+                    </div>
+                    <div className="step-line" />
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="features" aria-labelledby="features-title">
+        <h2 id="features-title" className="section-title">Everything You Need</h2>
+
+        <div className="features-grid">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              className="feature-card"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -10, scale: 1.02 }}
+              onHoverStart={() => setHoveredCard(index)}
+              onHoverEnd={() => setHoveredCard(null)}
+              onClick={() => navigate(feature.link)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") navigate(feature.link);
+              }}
+              aria-label={`${feature.title} - ${feature.desc}`}
+            >
+              <div className="card-icon" style={{ backgroundColor: `${feature.color}20` }}>
+                <span style={{ color: feature.color, fontSize: "1.75rem" }}>{feature.icon}</span>
+              </div>
+
+              <h3>{feature.title}</h3>
+              <p>{feature.desc}</p>
+
+              <button
+                type="button"
+                className="card-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(feature.link);
+                }}
+              >
+                Go to {feature.title}
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="stats" aria-label="Platform statistics">
+        <div className="stats-grid">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+            <div className="stat-number">10K+</div>
+            <div className="stat-label">Active Users</div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="stat-number">500+</div>
+            <div className="stat-label">Jobs Daily</div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="stat-number">95%</div>
+            <div className="stat-label">Success Rate</div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Footer */}
+      <footer className="cta-footer">
+        <div className="cta-content">
+          <h2>Ready to Transform Your Career?</h2>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="cta-footer-btn"
+            onClick={() => navigate("/signup")}
+          >
+            Get Started Free
+          </motion.button>
+        </div>
+      </footer>
+    </div>
   );
 };
 

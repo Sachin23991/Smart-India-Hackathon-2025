@@ -135,6 +135,7 @@
   cursor: pointer;
   font-weight: 500;
   transition: border .2s;
+  color: #000;
 }
 
 .auth-login-oauth-btn:hover {

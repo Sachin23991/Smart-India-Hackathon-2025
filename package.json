@@ -16,7 +16,7 @@
     "emoji-picker-react": "^4.13.3",
     "express": "^5.1.0",
     "firebase": "^12.1.0",
-    "framer-motion": "^12.23.16",
+    "framer-motion": "^12.23.24",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "openai": "^5.23.0",
