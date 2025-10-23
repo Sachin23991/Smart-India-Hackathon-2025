@@ -17,6 +17,9 @@
   --gray-700: #374151;  /* Heading text */
   --gray-900: #111827;  /* Body text */
 
+  /* Logo color (change this to taste) */
+  --logo-color: #378ef8; /* deep indigo blue */
+
   /* Accent Colors */
   --success: #10B981;   /* For success or status messages */
   --warning: #F59E0B;   /* Soft orange for warnings */
@@ -90,12 +93,13 @@
   gap: var(--spacing-xs);
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--gray-800);
+  color: var(--logo-color);
 }
 
 .logo-icon {
   height: 32px;
   width: auto;
+  animation: logo-spin 10s linear infinite;
 }
 
 .nav-links {
@@ -140,11 +144,20 @@
   max-width: 1200px;
   margin: 0 auto;
   gap: var(--spacing-xl);
+  width : 100%;
+}
+.hero-main-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: var(--spacing-xl);
 }
 
 .hero-content {
-  text-align: center;
-  max-width: 800px;
+ text-align: center; /* Changed from 'center' */
+  flex: 1.2; /* Give text a bit more space */
+  max-width: 600px;
 }
 
 .hero-title {
@@ -160,6 +173,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  
 }
 
 .ai-highlight {
@@ -184,8 +198,9 @@
   line-height: 1.6;
   margin-bottom: 2.5rem;
   max-width: 600px;
-  margin-left: auto;
+  margin-left: auto;  /* <<< ADD THIS LINE BACK */
   margin-right: auto;
+  
 }
 
 .hero-buttons {
@@ -194,7 +209,19 @@
   justify-content: center;
   flex-wrap: wrap;
 }
-
+.hero-video-container {
+  flex: 1;
+  max-width: 500px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden; /* Clips the video to the border-radius */
+  border: 1px solid var(--gray-200);
+}
+.hero-video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 .cta-primary, .cta-secondary {
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-lg);
@@ -237,25 +264,30 @@
 .roadmap {
   position: relative;
   padding: 3rem 0;
+  padding-bottom: 6rem; /* ensure roadmap has extra bottom space so next section is not overlapped */
   background: transparent; /* remove any solid bg */
+  overflow: hidden; /* clip decorative SVG so it doesn't bleed into the next section */
 }
 
+/* keep path behind steps but above the page background */
 .roadmap-path {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  z-index: 1;
+  height: 200px;
+  z-index: 1; /* sit below .roadmap-steps (2) but above the page base */
   background: transparent;
+  pointer-events: none; /* allow clicks/interaction to pass through and avoid blocking content */
 }
 
+/* ensure steps remain on top of the decorative path */
 .roadmap-steps {
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
-  z-index: 2;
+  z-index: 2; /* stays above the decorative path */
   padding: 0 var(--spacing-xl);
   background: transparent;
 }
@@ -274,7 +306,17 @@
 .roadmap-step.active {
   transform: scale(1.05);
 }
-
+.roadmap-path path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: hf-strokeDraw 1.5s ease forwards;
+  animation-delay: 0.2s;
+  opacity: 0.85;
+}
+@keyframes hf-strokeDraw {
+  from { stroke-dashoffset: 1000; }
+  to   { stroke-dashoffset: 0; }
+}
 .step-icon {
   width: 80px;
   height: 80px;
@@ -321,6 +363,23 @@
   padding: 6rem var(--spacing-lg);
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 0; /* do not overlap the roadmap visuals */
+  margin-top: calc(var(--spacing-lg) + 1.5rem); /* extra separation from roadmap */
+}
+
+.features::before {
+  content: "";
+  position: absolute;
+  top: -1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(99,102,241,0.12), rgba(37,99,235,0.12));
+  pointer-events: none;
+  opacity: 0.9;
 }
 
 .section-title {
@@ -408,6 +467,129 @@
   display: flex;
 }
 
+/* ========== Subtle animations ========== */
+@keyframes hf-fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hf-float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes hf-strokeDraw {
+  from { stroke-dashoffset: 1000; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes hf-scaleIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Roadmap stroke draw (subtle) */
+.roadmap-path path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: hf-strokeDraw 1.6s ease forwards;
+  animation-delay: 0.2s;
+  opacity: 0.8;
+}
+
+/* Roadmap steps fade-in stagger (use --anim-delay set from JSX) */
+.step-animate {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: hf-fadeUp 520ms cubic-bezier(.2,.9,.2,1) forwards;
+  animation-delay: var(--anim-delay, 0s);
+}
+
+/* Gentle floating for icons (long period so it's subtle) */
+.step-animate .step-icon {
+  animation: hf-float 6s ease-in-out calc(var(--anim-delay, 0s) + 200ms) infinite;
+  will-change: transform;
+}
+
+/* Feature cards: soft fade-up and slight pop when visible (non-flashy) */
+.feature-anim {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: hf-fadeUp 560ms cubic-bezier(.2,.9,.2,1) forwards;
+  animation-delay: var(--anim-delay, 0s);
+}
+
+/* Stats items scale-in */
+.stat-item {
+  opacity: 0;
+  transform: scale(0.98);
+  animation: hf-scaleIn 420ms ease forwards;
+  animation-delay: var(--anim-delay, 0s);
+}
+
+/* Mobile nav slide down for menu open */
+.nav-links.mobile-open {
+  animation: hf-fadeUp 280ms ease forwards;
+}
+
+/* Small hover pop for CTAs (already have transform but keep it smooth) */
+.cta-primary, .cta-secondary, .card-btn {
+  transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease, background 220ms ease;
+}
+
+/* Pop-out on hover and when scrolled into view */
+/* base - prepare for transforms and smooth transitions */
+.animate-pop {
+  will-change: transform, box-shadow;
+  transition: transform 0.36s cubic-bezier(.2,.9,.2,1), box-shadow 0.36s;
+  transform: translateY(0) scale(1);
+  box-shadow: 0 8px 24px rgba(16,24,40,0.04);
+}
+
+/* when element becomes visible (added by IntersectionObserver) -> subtle pop */
+.animate-pop.is-visible {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 18px 40px rgba(37,99,235,0.08); /* gentle colored lift */
+}
+
+/* stronger but still subtle feedback on hover / focus */
+.animate-pop:hover,
+.animate-pop:focus {
+  transform: translateY(-16px) scale(1.10); /* More pop! */
+  box-shadow: 0 32px 70px rgba(37,99,235,0.24); /* Strong shadow pop */
+  outline: none;
+}
+
+/* ensure keyboard focus gets same effect for accessibility */
+.animate-pop:focus-visible {
+  box-shadow: 0 24px 50px rgba(37,99,235,0.18);
+}
+
+/* don't conflict with active step scaling — prefer active scale + visibility */
+.roadmap-step.active.animate-pop.is-visible {
+  transform: translateY(-10px) scale(1.06);
+}
+
+/* keep the small float animation for icons but do not conflict with pop-out */
+.step-animate .step-icon {
+  transition: transform 360ms ease;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop,
+  .animate-pop.is-visible,
+  .animate-pop:hover,
+  .animate-pop:focus,
+  .step-animate .step-icon {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
 /* Responsive */
 /* Large Desktop (1200px+) - default styles above */
 
@@ -420,6 +602,34 @@
   .hero {
     padding: 100px var(--spacing-md) var(--spacing-lg);
   }
+   .hero-main-content {
+    /* Stack text on top of video on tablets and smaller */
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+
+  .hero-content {
+    /* Restore centered text when stacked */
+    text-align: center;
+    max-width: 700px; /* Allow it to be wider when centered */
+  }
+
+  .hero-subtitle {
+    /* Restore centered margin when stacked */
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .hero-buttons {
+     /* Restore centered buttons when stacked */
+    justify-content: center;
+  }
+  
+  .hero-video-container {
+    width: 100%;
+    max-width: 600px; /* Allow video to be a bit wider */
+  }
+  
 
   .roadmap-steps {
     padding: 0 var(--spacing-md);
@@ -843,4 +1053,55 @@
 .cta-footer-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-primary);
+}
+
+
+
+/* Add this new class to style the logo text */
+.logo-text {
+  /* Create a gradient for the text background */
+  background: linear-gradient(
+    90deg,
+    var(--logo-color),
+    var(--secondary),
+    var(--primary-light),
+    var(--logo-color)
+  );
+
+  /* Set the background size to be larger than the text */
+  /* This is what allows the gradient to move */
+  background-size: 300% auto;
+
+  /* Clip the background to the text */
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  /* Make the text color transparent so the gradient shows through */
+  -webkit-text-fill-color: transparent;
+
+  /* Apply the animation */
+  animation: logo-shine 6s ease-in-out infinite;
+}
+
+/* Add these keyframes to define the animation */
+@keyframes logo-shine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
